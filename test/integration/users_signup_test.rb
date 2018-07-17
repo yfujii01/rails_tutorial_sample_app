@@ -16,10 +16,26 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     end
     assert_template 'users/new'
 
-
     assert_select 'div#error_explanation'
     assert_select 'div.alert'
     assert_select 'div.alert-danger'
+  end
 
+  test 'valid signup information' do
+    get signup_path
+    assert_difference 'User.count', 1 do
+      post users_path, params: { user: { name: 'Example User',
+                                         email: 'user@example.com',
+                                         password: 'password',
+                                         password_confirmation: 'password' } }
+    end
+    follow_redirect!
+    assert_template 'users/show'
+
+    assert_not flash.alert
+
+    # メッセージは変更になることが多いのでテストには含めないほうが良い
+    # assert_equal flash[:success], 'Welcome to the Sample App!'
+    assert flash[:success]
   end
 end
