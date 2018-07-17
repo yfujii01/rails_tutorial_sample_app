@@ -8,6 +8,7 @@ class SessionsController < ApplicationController
       # ログイン成功
 
       log_in user
+      remember user
 
       redirect_to user
 
