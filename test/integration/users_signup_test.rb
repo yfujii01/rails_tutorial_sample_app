@@ -32,8 +32,6 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_template 'users/show'
 
-    assert_not flash.alert
-
     # メッセージは変更になることが多いのでテストには含めないほうが良い
     # assert_equal flash[:success], 'Welcome to the Sample App!'
     assert flash[:success]
