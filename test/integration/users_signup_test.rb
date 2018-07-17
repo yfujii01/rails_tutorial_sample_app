@@ -35,5 +35,7 @@ class UsersSignupTest < ActionDispatch::IntegrationTest
     # メッセージは変更になることが多いのでテストには含めないほうが良い
     # assert_equal flash[:success], 'Welcome to the Sample App!'
     assert flash[:success]
+
+    assert is_logged_in?
   end
 end
