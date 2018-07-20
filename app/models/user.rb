@@ -18,7 +18,8 @@ class User < ApplicationRecord
   has_secure_password
 
   validates :password, length: { minimum: 6 },
-                       presence: true
+                       presence: true,
+                       allow_nil: true
 
   # 渡された文字列のハッシュ値を返す
   def self.digest(string)
@@ -51,5 +52,4 @@ class User < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
-
 end
