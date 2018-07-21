@@ -1,10 +1,12 @@
 class UsersController < ApplicationController
-
   # ページ表示前にログインユーザーか確認し、未ログインの場合ログインページに飛ばす
-  before_action :logged_in_user, only: [:index, :edit, :update]
+  before_action :logged_in_user, only: %i[index edit update destroy]
 
   # ログインユーザーと別ユーザーのページを開こうとした場合、root_urlに飛ばす
-  before_action :correct_user, only: [:edit, :update]
+  before_action :correct_user, only: %i[edit update]
+
+  # ユーザー削除は管理者だけ
+  before_action :admin_user, only: :destroy
 
   def index
     # @users = User.all
@@ -48,6 +50,12 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy
+    User.find(params[:id]).destroy
+    flash[:success] = 'User deleted'
+    redirect_to users_url
+  end
+
   private
 
   def user_params
@@ -82,4 +90,10 @@ class UsersController < ApplicationController
     # こちらも同じ意味
     # redirect_to root_url if @user != current_user
   end
+
+  # 管理者かどうか確認
+  def admin_user
+    redirect_to(root_url) unless current_user.admin?
+  end
+
 end
