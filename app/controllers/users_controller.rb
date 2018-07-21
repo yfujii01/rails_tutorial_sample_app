@@ -1,10 +1,14 @@
 class UsersController < ApplicationController
 
   # ページ表示前にログインユーザーか確認し、未ログインの場合ログインページに飛ばす
-  before_action :logged_in_user, only: [:edit, :update]
+  before_action :logged_in_user, only: [:index, :edit, :update]
 
   # ログインユーザーと別ユーザーのページを開こうとした場合、root_urlに飛ばす
   before_action :correct_user, only: [:edit, :update]
+
+  def index
+    @users = User.all
+  end
 
   def new
     @user = User.new
