@@ -10,7 +10,8 @@ class UsersController < ApplicationController
 
   def index
     # @users = User.all
-    @users = User.paginate(page: params[:page])
+    # @users = User.paginate(page: params[:page])
+    @users = User.where(activated: true).paginate(page: params[:page])
   end
 
   def new
@@ -19,6 +20,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    redirect_to root_url and return unless @user.activated?
   end
 
   def create
@@ -26,7 +28,7 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
 
     if @user.save
-      UserMailer.account_activation(@user).deliver_now
+      @user.send_activation_email
       flash[:info] = "Please check your email to activate your account."
       redirect_to root_url
     else
@@ -56,42 +58,42 @@ class UsersController < ApplicationController
 
   private
 
-  def user_params
-    params.require(:user).permit(:name, :email, :password,
-                                 :password_confirmation)
-  end
+    def user_params
+      params.require(:user).permit(:name, :email, :password,
+                                   :password_confirmation)
+    end
 
   # beforeアクション
 
   # ログイン済みユーザーかどうか確認
-  def logged_in_user
-    unless logged_in?
-      store_location
-      flash[:danger] = 'Please log in.'
-      redirect_to login_url
+    def logged_in_user
+      unless logged_in?
+        store_location
+        flash[:danger] = 'Please log in.'
+        redirect_to login_url
+      end
     end
-  end
 
   # 正しいユーザーかどうか確認して、異なる場合root_urlへ飛ばす
-  def correct_user
-    @user = User.find(params[:id])
-    redirect_to(root_url) unless current_user?(@user)
+    def correct_user
+      @user = User.find(params[:id])
+      redirect_to(root_url) unless current_user?(@user)
 
-    # 別の書き方
-    # redirect_to(root_url) unless @user == current_user
-    #
-    # 同じ意味
-    # unless @user == current_user
-    #   redirect_to root_url
-    # end
-    #
-    # こちらも同じ意味
-    # redirect_to root_url if @user != current_user
-  end
+      # 別の書き方
+      # redirect_to(root_url) unless @user == current_user
+      #
+      # 同じ意味
+      # unless @user == current_user
+      #   redirect_to root_url
+      # end
+      #
+      # こちらも同じ意味
+      # redirect_to root_url if @user != current_user
+    end
 
   # 管理者かどうか確認
-  def admin_user
-    redirect_to(root_url) unless current_user.admin?
-  end
+    def admin_user
+      redirect_to(root_url) unless current_user.admin?
+    end
 
 end
