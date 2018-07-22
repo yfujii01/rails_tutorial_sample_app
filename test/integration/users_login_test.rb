@@ -3,6 +3,37 @@ require 'test_helper'
 class UsersLoginTest < ActionDispatch::IntegrationTest
   def setup
     @user = users(:michael)
+    @no_activate_user = users(:lana)
+  end
+
+  test 'no active user' do
+
+    # ログイン画面へ遷移
+    get login_path
+
+    # ログインする(正常)
+    post login_path, params: { session: { email: @no_activate_user.email,
+                                          password: 'password' } }
+
+    # アクティベートされていないユーザーの場合
+    # rootページへリダイレクトされていること
+    assert_redirected_to root_url
+    follow_redirect!
+
+    # レイアウト確認
+    assert_template root_path
+
+    # ログインページヘのリンクがあること
+    assert_select 'a[href=?]', login_path
+
+    # ログアウトのリンクが無いこと
+    assert_select 'a[href=?]', logout_path, count: 0
+
+    # ユーザーページへのリンクが無いこと
+    assert_select 'a[href=?]', user_path(@user), count: 0
+
+    # ユーザー一覧ページへのリンクが無いこと
+    assert_select 'a[href=?]', users_path, count: 0
   end
 
   test 'the truth' do
