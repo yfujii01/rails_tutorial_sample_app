@@ -110,5 +110,39 @@ class PasswordResetsTest < ActionDispatch::IntegrationTest
 
     # ユーザーページが表示されること
     assert_redirected_to user
+
+    # reset_digestが無効化されていることを確認
+    assert_nil @user.reload.reset_digest
   end
+
+  test "expired token" do
+
+    # パスワードリセットページを表示
+    get new_password_reset_path
+
+    # 正しいemail設定をpost
+    post password_resets_path,
+         params: { password_reset: { email: @user.email } }
+
+    # ユーザー取得
+    @user = assigns(:user)
+
+    # リセットメール送信時間を3時間前に設定
+    @user.update_attribute(:reset_sent_at, 3.hours.ago)
+
+    # パスワード再設定を実施
+    patch password_reset_path(@user.reset_token),
+          params: { email: @user.email,
+                    user: { password:              "foobar",
+                            password_confirmation: "foobar" } }
+
+    # ページ読み込み
+    assert_response :redirect
+    follow_redirect!
+
+    # expiredの文字が含まれるかチェックする
+    assert_match /expired/i, response.body
+
+  end
+
 end
