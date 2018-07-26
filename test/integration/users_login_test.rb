@@ -150,7 +150,7 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
 
   test 'login with remembering' do
     # cookieのremember_tokenに値が設定されていないこと
-    assert_equal nil, cookies['remember_token']
+    assert_nil cookies['remember_token']
 
     # ログイン状態を記憶してログイン
     log_in_as(@user, remember_me: '1')
@@ -164,7 +164,7 @@ class UsersLoginTest < ActionDispatch::IntegrationTest
 
   test 'login without remembering' do
     # cookieのremember_tokenに値が設定されていないこと
-    assert_equal nil, cookies['remember_token']
+    assert_nil cookies['remember_token']
 
     # ログイン状態を記憶してログイン
     log_in_as(@user, remember_me: '1')
