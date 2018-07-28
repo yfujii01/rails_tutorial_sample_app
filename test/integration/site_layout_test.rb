@@ -39,7 +39,7 @@ class SiteLayoutTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", logout_path
 
     # ボディ
-    assert_select "a[href=?]", signup_path
+    # assert_select "a[href=?]", signup_path
 
     # フッタ
     assert_select "a[href=?]", about_path
