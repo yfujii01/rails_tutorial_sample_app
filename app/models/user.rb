@@ -87,18 +87,23 @@ class User < ApplicationRecord
     reset_sent_at < 2.hours.ago
   end
 
+  # feedの定義
+  def feed
+    Micropost.where("user_id = ?", id)
+  end
+
   private
 
-    def downcase_email
-      # メールアドレスをすべて小文字にする
-      # self.email = email.downcase
-      email.downcase!
-    end
+  def downcase_email
+    # メールアドレスをすべて小文字にする
+    # self.email = email.downcase
+    email.downcase!
+  end
 
-    def create_activation_digest
-      # 有効化トークンとダイジェストを作成および代入する
-      self.activation_token = User.new_token
-      self.activation_digest = User.digest(activation_token)
-    end
+  def create_activation_digest
+    # 有効化トークンとダイジェストを作成および代入する
+    self.activation_token = User.new_token
+    self.activation_digest = User.digest(activation_token)
+  end
 
 end
