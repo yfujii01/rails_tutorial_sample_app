@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   # ページ表示前にログインユーザーか確認し、未ログインの場合ログインページに飛ばす
-  before_action :logged_in_user, only: %i[index edit update destroy]
+  before_action :logged_in_user, only: %i[index edit update destroy following followers]
 
   # ログインユーザーと別ユーザーのページを開こうとした場合、root_urlに飛ばす
   before_action :correct_user, only: %i[edit update]
@@ -56,6 +56,20 @@ class UsersController < ApplicationController
     User.find(params[:id]).destroy
     flash[:success] = 'User deleted'
     redirect_to users_url
+  end
+
+  def following
+    @title = "Following"
+    @user = User.find(params[:id])
+    @users = @user.following.paginate(page: params[:page])
+    render 'show_follow'
+  end
+
+  def followers
+    @title = "Followers"
+    @user = User.find(params[:id])
+    @users = @user.followers.paginate(page: params[:page])
+    render 'show_follow'
   end
 
   private
