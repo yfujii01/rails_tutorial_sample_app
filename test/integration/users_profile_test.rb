@@ -5,6 +5,7 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
 
   def setup
     @user = users(:michael)
+    @user2 = users(:archer)
   end
 
   test "profile display" do
@@ -13,6 +14,8 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
 
     assert_select 'title', full_title(@user.name)
     assert_select 'h1', text: @user.name
+    assert_select '#following', text: "0"
+    assert_select '#followers', text: "0"
     assert_select 'h1>img.gravatar'
     assert_match @user.microposts.count.to_s, response.body
     assert_select 'div.pagination'
@@ -20,5 +23,19 @@ class UsersProfileTest < ActionDispatch::IntegrationTest
       assert_match micropost.content, response.body
     end
 
+    # フォローのカウント数表示が正しいかチェック
+    @user.follow(@user2)
+    assert_select '#following', text: "0"
+    assert_select '#followers', text: "0"
+    get user_path(@user)
+    assert_select '#following', text: "1"
+    assert_select '#followers', text: "0"
+
+    @user2.follow(@user)
+    assert_select '#following', text: "1"
+    assert_select '#followers', text: "0"
+    get user_path(@user)
+    assert_select '#following', text: "1"
+    assert_select '#followers', text: "1"
   end
 end
